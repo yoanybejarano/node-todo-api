@@ -15,4 +15,4 @@ var Todo = mongoose.model('todos', {
     }
 });
 
-module.exports = { Todo };
+module.exports = {Todo};
