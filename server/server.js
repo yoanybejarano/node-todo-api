@@ -1,12 +1,13 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 
-var {mongoose} = require('./db/mongoose');
-var {Todo} = require('./models/todo');
-var {User} = require('./models/user');
-const {ObjectID} = require('mongodb');
+var { mongoose } = require('./db/mongoose');
+var { Todo } = require('./models/todo');
+var { User } = require('./models/user');
+const { ObjectID } = require('mongodb');
 
 var app = express();
+const port = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
 
@@ -54,14 +55,27 @@ app.get('/users/:id', (req, res) => {
     }
     User.findById(req.params.id).then((user) => {
         if (!user) return res.status(404).send();
-        res.send({user});
+        res.send({ user });
     }).catch(function (err) {
         res.status(400).send();
     });
 });
 
-app.listen(3000, () => {
-    console.log('Started on port 3000');
+app.delete('/todos/:id', (req, res) => {
+    if (!ObjectID.isValid(req.params.id)) {
+        console.log('ID is not valid');
+        return res.status(404).send();
+    }
+    Todo.findByIdAndDelete({ _id: req.params.id }).then((todo) => {
+        if (!todo) return res.status(404).send();
+        res.send(todo);
+    }).catch((err) => {
+        res.status(400).send();
+    });
 });
 
-module.exports = {app};
+app.listen(3000, () => {
+    console.log(`Started on port ${port}`);
+});
+
+module.exports = { app };
