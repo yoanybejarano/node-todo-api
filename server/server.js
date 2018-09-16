@@ -4,11 +4,11 @@ var _ = require('lodash');
 var express = require('express');
 var bodyParser = require('body-parser');
 
-var { mongoose } = require('./db/mongoose');
-var { Todo } = require('./models/todo');
-var { User } = require('./models/user');
-const { ObjectID } = require('mongodb');
-var { authenticate } = require('./middleware/authenticate');
+var {mongoose} = require('./db/mongoose');
+var {Todo} = require('./models/todo');
+var {User} = require('./models/user');
+const {ObjectID} = require('mongodb');
+var {authenticate} = require('./middleware/authenticate');
 
 var app = express();
 const port = process.env.PORT || 3000;
@@ -46,7 +46,7 @@ app.get('/todos/:id', (req, res) => {
 
     Todo.findById(req.params.id).then((todo) => {
         if (!todo) return res.status(404).send();
-        res.send({ todo });
+        res.send({todo});
     }).catch((err) => {
         res.status(400).send();
     });
@@ -57,9 +57,9 @@ app.delete('/todos/:id', (req, res) => {
     if (!ObjectID.isValid(req.params.id)) {
         return res.status(404).send();
     }
-    Todo.findByIdAndDelete({ _id: req.params.id }).then((todo) => {
+    Todo.findByIdAndDelete({_id: req.params.id}).then((todo) => {
         if (!todo) return res.status(404).send();
-        res.send({ todo });
+        res.send({todo});
     }).catch((err) => {
         res.status(400).send();
     });
@@ -80,9 +80,9 @@ app.patch('/todos/:id', (req, res) => {
         body.completedAt = null;
     }
 
-    Todo.findOneAndUpdate(id, { $set: body }, { new: true }).then((todo) => {
+    Todo.findOneAndUpdate(id, {$set: body}, {new: true}).then((todo) => {
         if (!todo) return res.status(404).send();
-        res.send({ todo });
+        res.send({todo});
     }).catch((err) => {
         res.status(400).send();
     });
@@ -135,8 +135,16 @@ app.post('/users/login', (req, res) => {
 
 });
 
+app.delete('/users/me/token', authenticate, (req, res) => {
+    req.user.removeToken(req.token).then(() => {
+        res.status(200).send();
+    }, () => {
+        res.status(400).send();
+    });
+});
+
 app.listen(3000, () => {
     console.log(`Started on port ${port}`);
 });
 
-module.exports = { app };
+module.exports = {app};
